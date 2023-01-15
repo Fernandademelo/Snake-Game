@@ -52,27 +52,35 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     public void draw(Graphics g) {
-        /*grid*/
-        for (int i = 0; i < SCREEN_HEIGHT / UNIT_SIZE; i++) {
-            g.drawLine(i * UNIT_SIZE, 0, i * UNIT_SIZE, SCREEN_HEIGHT);
-            g.drawLine(0, i * UNIT_SIZE, SCREEN_WIDTH, i * UNIT_SIZE);
-        }
-        /*APPLE*/
-        g.setColor(Color.pink);
-        g.fillOval(appleX, appleY, UNIT_SIZE, UNIT_SIZE);
-
-        /*corpinho*/
-
-        for (int i = 0; i < bodyParts; i++) {
-            if (i == 0) {
-                g.setColor(Color.green);
-                g.fillRect(x[i], y[i], UNIT_SIZE, UNIT_SIZE);
-            } else {
-                g.setColor(new Color(0, 255, 255));
-                g.fillRect(x[i], y[i], UNIT_SIZE, UNIT_SIZE);
+        if (running) {
+            /*grid*/
+            for (int i = 0; i < SCREEN_HEIGHT / UNIT_SIZE; i++) {
+                g.drawLine(i * UNIT_SIZE, 0, i * UNIT_SIZE, SCREEN_HEIGHT);
+                g.drawLine(0, i * UNIT_SIZE, SCREEN_WIDTH, i * UNIT_SIZE);
             }
-        }
+            /*APPLE*/
+            g.setColor(Color.pink);
+            g.fillOval(appleX, appleY, UNIT_SIZE, UNIT_SIZE);
 
+            /*corpinho*/
+
+            for (int i = 0; i < bodyParts; i++) {
+                if (i == 0) {
+                    g.setColor(Color.green);
+                    g.fillRect(x[i], y[i], UNIT_SIZE, UNIT_SIZE);
+                } else {
+                    g.setColor(new Color(0, 255, 255));
+                    g.fillRect(x[i], y[i], UNIT_SIZE, UNIT_SIZE);
+                }
+            }
+            /*Display the Score!*/
+            g.setColor(Color.pink);
+            g.setFont(new Font("Harlow Solid Italic", Font.PLAIN, 30));
+            FontMetrics metrics = getFontMetrics(g.getFont());
+            g.drawString("Score: " + applesEaten,(SCREEN_WIDTH - metrics.stringWidth("Score: " + applesEaten))/2,g.getFont().getSize());
+        }else {
+            gameOver(g);
+        }
     }
 
 
@@ -81,6 +89,7 @@ public class GamePanel extends JPanel implements ActionListener {
         appleX = random.nextInt((int) (SCREEN_HEIGHT / UNIT_SIZE)) * UNIT_SIZE;
 
     }
+
 
     public void move() {
         for (int i = bodyParts; i > 0; i--) {
@@ -104,9 +113,17 @@ public class GamePanel extends JPanel implements ActionListener {
 
     }
 
+
     public void checkApple() {
+        /*Eat Apple and grow body*/
+        if ((x[0] == appleX) && (y[0] == appleY)) {
+            bodyParts++;
+            applesEaten++;
+            newApple();
+        }
 
     }
+
 
     public void checkCollisons() {
         /*checks if head colLides with body*/
@@ -137,7 +154,14 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
 
-    public void gameOver() {
+
+    public void gameOver(Graphics g) {
+        /*Game Over text*/
+        g.setColor(Color.pink);
+        g.setFont(new Font("Harlow Solid Italic", Font.PLAIN, 75));
+        FontMetrics metrics = getFontMetrics(g.getFont());
+        /*GAME OVER IN THE CENTER OF THE SCREEN*/
+        g.drawString("Game Over",(SCREEN_WIDTH - metrics.stringWidth("Game Over"))/2, SCREEN_HEIGHT/2);
 
     }
 

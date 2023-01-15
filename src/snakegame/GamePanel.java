@@ -26,20 +26,30 @@ public class GamePanel extends JPanel implements ActionListener {
     boolean running = false;
     Timer timer;
     Random random;
+
     private Image head;
+    private Image fundo;
+
+
 
     public void LoadImages(){
-        ImageIcon cabecinha = new ImageIcon("images/snakehead.png");
-        head = cabecinha.getImage();
-    }
+            ImageIcon cabecinha = new ImageIcon("images/snakehead.png");
+            head = cabecinha.getImage();
+            ImageIcon backgroundImg = new ImageIcon("images/background.png");
+            fundo = backgroundImg.getImage();
 
-    GamePanel() {
+
+        }
+
+
+        GamePanel() {
 
         random = new Random();
-        this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
-        this.setBackground(Color.BLACK);
-        this.setFocusable(true);
-        this.addKeyListener(new MyKeyAdapter());
+            LoadImages();
+            this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
+            this.setBackground(Color.BLACK);
+            this.setFocusable(true);
+            this.addKeyListener(new MyKeyAdapter());
         startGame();
 
     }
@@ -52,6 +62,7 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     public void paintComponent(Graphics g) {
+        g.drawImage(fundo, 0, 0, this);
         super.paintComponent(g);
         draw(g);
 
@@ -74,7 +85,7 @@ public class GamePanel extends JPanel implements ActionListener {
                 if (i == 0) {
                     g.drawImage(head, x[i], y[i], this);
                     g.setColor(Color.green);
-                    g.fillRect(x[i], y[i], UNIT_SIZE, UNIT_SIZE);
+
                 } else {
                     g.setColor(new Color(0, 255, 255));
                     g.setColor(new Color(random.nextInt(100), random.nextInt(200),random.nextInt(255))); //random body color
@@ -94,7 +105,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
     public void newApple() {
         appleX = random.nextInt((int) (SCREEN_WIDTH / UNIT_SIZE)) * UNIT_SIZE;
-        appleX = random.nextInt((int) (SCREEN_HEIGHT / UNIT_SIZE)) * UNIT_SIZE;
+        appleY = random.nextInt((int) (SCREEN_HEIGHT / UNIT_SIZE)) * UNIT_SIZE;
 
     }
 
@@ -177,6 +188,9 @@ public class GamePanel extends JPanel implements ActionListener {
         FontMetrics metrics2 = getFontMetrics(g.getFont());
         /*GAME OVER IN THE CENTER OF THE SCREEN*/
         g.drawString("Game Over",(SCREEN_WIDTH - metrics2.stringWidth("Game Over"))/2, SCREEN_HEIGHT/2);
+        g.setFont(new Font("Harlow Solid Italic", Font.PLAIN, 25));
+      //  FontMetrics metrics3 = getFontMetrics(g.getFont());
+       // g.drawString("Press ENTER to restart" + applesEaten,(SCREEN_WIDTH - metrics3.stringWidth("Press ENTER to restart"))/5,g.getFont().getSize());
 
        /* Hit Enter to Restart the game! :) */
         addKeyListener(new KeyAdapter() {

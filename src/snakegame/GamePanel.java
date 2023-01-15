@@ -6,10 +6,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.geom.AffineTransform;
 import java.util.Random;
 
 
 public class GamePanel extends JPanel implements ActionListener {
+
 
     static final int SCREEN_WIDTH = 600;
     static final int SCREEN_HEIGHT = 600;
@@ -29,27 +31,29 @@ public class GamePanel extends JPanel implements ActionListener {
 
     private Image head;
     private Image fundo;
+    private Image currentEmoji;
+    AffineTransform at = new AffineTransform();
 
 
-
-    public void LoadImages(){
-            ImageIcon cabecinha = new ImageIcon("images/snakehead.png");
-            head = cabecinha.getImage();
-            ImageIcon backgroundImg = new ImageIcon("images/background.png");
-            fundo = backgroundImg.getImage();
-
-
-        }
+    public void LoadImages() {
+        ImageIcon cabecinha = new ImageIcon("src/images/snakehead.png");
+        head = cabecinha.getImage();
+        head = head.getScaledInstance(UNIT_SIZE, UNIT_SIZE, Image.SCALE_SMOOTH);
+        ImageIcon backgroundImg = new ImageIcon("src/images/background.png");
+        fundo = backgroundImg.getImage();
 
 
-        GamePanel() {
+    }
+
+
+    GamePanel() {
 
         random = new Random();
-            LoadImages();
-            this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
-            this.setBackground(Color.BLACK);
-            this.setFocusable(true);
-            this.addKeyListener(new MyKeyAdapter());
+        LoadImages();
+        this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
+        this.setBackground(Color.BLACK);
+        this.setFocusable(true);
+        this.addKeyListener(new MyKeyAdapter());
         startGame();
 
     }
@@ -62,6 +66,7 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     public void paintComponent(Graphics g) {
+
         g.drawImage(fundo, 0, 0, this);
         super.paintComponent(g);
         draw(g);
@@ -69,7 +74,9 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     public void draw(Graphics g) {
+
         if (running) {
+            Graphics2D g2d = (Graphics2D) g;
 //          /*grid*/
 //            for (int i = 0; i < SCREEN_HEIGHT / UNIT_SIZE; i++) {
 //                g.drawLine(i * UNIT_SIZE, 0, i * UNIT_SIZE, SCREEN_HEIGHT);
@@ -77,18 +84,20 @@ public class GamePanel extends JPanel implements ActionListener {
 //            }
             /*APPLE*/
             g.setColor(Color.red);
-            g.fillOval(appleX, appleY, UNIT_SIZE, UNIT_SIZE);
+            g.drawImage(currentEmoji, appleX, appleY, UNIT_SIZE, UNIT_SIZE, this);
 
             /*corpinho*/
-
             for (int i = 0; i < bodyParts; i++) {
                 if (i == 0) {
-                    g.drawImage(head, x[i], y[i], this);
-                    g.setColor(Color.green);
+                    g2d.setTransform(at);
+                    g2d.drawImage(head, x[i], y[i], UNIT_SIZE, UNIT_SIZE, this);
+                    g2d.setTransform(new AffineTransform());
+                    // g.drawImage(head, x[i], y[i], this);
+                    //g.setColor(Color.green);
 
                 } else {
                     g.setColor(new Color(0, 255, 255));
-                    g.setColor(new Color(random.nextInt(100), random.nextInt(200),random.nextInt(255))); //random body color
+                    g.setColor(new Color(random.nextInt(100), random.nextInt(200), random.nextInt(255))); //random body color
                     g.fillRect(x[i], y[i], UNIT_SIZE, UNIT_SIZE);
                 }
             }
@@ -96,14 +105,25 @@ public class GamePanel extends JPanel implements ActionListener {
             g.setColor(Color.pink);
             g.setFont(new Font("Harlow Solid Italic", Font.PLAIN, 30));
             FontMetrics metrics1 = getFontMetrics(g.getFont());
-            g.drawString("Score: " + applesEaten,(SCREEN_WIDTH - metrics1.stringWidth("Score: " + applesEaten))/2,g.getFont().getSize());
-        }else {
+            g.drawString("Score: " + applesEaten, (SCREEN_WIDTH - metrics1.stringWidth("Score: " + applesEaten)) / 2, g.getFont().getSize());
+        } else {
             gameOver(g);
         }
     }
 
 
     public void newApple() {
+        /*Array of fruit emojis*/
+        ImageIcon[] emojis = new ImageIcon[5];
+        emojis[0] = new ImageIcon("src/images/cherry.png");
+        emojis[1] = new ImageIcon("src/images/peach.png");
+        emojis[2] = new ImageIcon("src/images/tangerine.png");
+        emojis[3] = new ImageIcon("src/images/uva.png");
+        emojis[4] = new ImageIcon("src/images/watermelon.png");
+        /*Appears random emojis on screen*/
+        int randomEmoji = random.nextInt(emojis.length);
+        currentEmoji = emojis[randomEmoji].getImage();
+
         appleX = random.nextInt((int) (SCREEN_WIDTH / UNIT_SIZE)) * UNIT_SIZE;
         appleY = random.nextInt((int) (SCREEN_HEIGHT / UNIT_SIZE)) * UNIT_SIZE;
 
@@ -111,6 +131,17 @@ public class GamePanel extends JPanel implements ActionListener {
 
 
     public void move() {
+        switch (direction) {
+            case 'U':
+                at.rotate(Math.toRadians(-90), head.getWidth(this) / 2, head.getHeight(this) / 2);
+                break;
+            case 'D':
+                at.rotate(Math.toRadians(90), head.getWidth(this) / 2, head.getHeight(this) / 2);
+                break;
+            case 'L':
+                at.rotate(Math.toRadians(180), head.getWidth(this) / 2, head.getHeight(this) / 2);
+                break;
+        }
         for (int i = bodyParts; i > 0; i--) {
             x[i] = x[i - 1];
             y[i] = y[i - 1];
@@ -173,7 +204,7 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
 
-    public void restartGame(){
+    public void restartGame() {
         new GameFrame();
     }
 
@@ -181,18 +212,18 @@ public class GamePanel extends JPanel implements ActionListener {
         g.setColor(Color.pink);
         g.setFont(new Font("Harlow Solid Italic", Font.PLAIN, 30));
         FontMetrics metrics1 = getFontMetrics(g.getFont());
-        g.drawString("Score: " + applesEaten,(SCREEN_WIDTH - metrics1.stringWidth("Score: " + applesEaten))/2,g.getFont().getSize());
+        g.drawString("Score: " + applesEaten, (SCREEN_WIDTH - metrics1.stringWidth("Score: " + applesEaten)) / 2, g.getFont().getSize());
         /*Game Over text*/
         g.setColor(Color.pink);
         g.setFont(new Font("Harlow Solid Italic", Font.PLAIN, 75));
         FontMetrics metrics2 = getFontMetrics(g.getFont());
         /*GAME OVER IN THE CENTER OF THE SCREEN*/
-        g.drawString("Game Over",(SCREEN_WIDTH - metrics2.stringWidth("Game Over"))/2, SCREEN_HEIGHT/2);
+        g.drawString("Game Over", (SCREEN_WIDTH - metrics2.stringWidth("Game Over")) / 2, SCREEN_HEIGHT / 2);
         g.setFont(new Font("Harlow Solid Italic", Font.PLAIN, 25));
-      //  FontMetrics metrics3 = getFontMetrics(g.getFont());
-       // g.drawString("Press ENTER to restart" + applesEaten,(SCREEN_WIDTH - metrics3.stringWidth("Press ENTER to restart"))/5,g.getFont().getSize());
+        //  FontMetrics metrics3 = getFontMetrics(g.getFont());
+        // g.drawString("Press ENTER to restart" + applesEaten,(SCREEN_WIDTH - metrics3.stringWidth("Press ENTER to restart"))/5,g.getFont().getSize());
 
-       /* Hit Enter to Restart the game! :) */
+        /* Hit Enter to Restart the game! :) */
         addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {

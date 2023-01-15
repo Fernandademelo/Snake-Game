@@ -7,7 +7,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.util.Random;
+import javax.sound.sampled.*;
+import java.io.File;
+
+
 
 
 public class GamePanel extends JPanel implements ActionListener {
@@ -35,20 +40,36 @@ public class GamePanel extends JPanel implements ActionListener {
     AffineTransform at = new AffineTransform();
 
 
+    public void playBackgroundMusic() {
+        try {
+            File soundFile = new File("src/music/song.wav");
+            AudioInputStream audioIn = AudioSystem.getAudioInputStream(soundFile);
+            Clip clip = AudioSystem.getClip();
+            clip.open(audioIn);
+            clip.start();
+            clip.loop(Clip.LOOP_CONTINUOUSLY);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void LoadImages() {
         ImageIcon cabecinha = new ImageIcon("src/images/snakehead.png");
         head = cabecinha.getImage();
         head = head.getScaledInstance(UNIT_SIZE, UNIT_SIZE, Image.SCALE_SMOOTH);
-        ImageIcon backgroundImg = new ImageIcon("src/images/background.png");
+
+
+    }
+    public void LoadBackground(){
+        ImageIcon backgroundImg = new ImageIcon("src/images/background.jpg");
         fundo = backgroundImg.getImage();
-
-
     }
 
 
     GamePanel() {
 
         random = new Random();
+        LoadBackground();;
         LoadImages();
         this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
         this.setBackground(Color.BLACK);
@@ -59,6 +80,7 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     public void startGame() {
+        playBackgroundMusic();
         newApple();
         running = true;
         timer = new Timer(DELAY, this);
@@ -67,8 +89,8 @@ public class GamePanel extends JPanel implements ActionListener {
 
     public void paintComponent(Graphics g) {
 
-        g.drawImage(fundo, 0, 0, this);
         super.paintComponent(g);
+        g.drawImage(fundo, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, this);
         draw(g);
 
     }
@@ -83,6 +105,10 @@ public class GamePanel extends JPanel implements ActionListener {
 //                g.drawLine(0, i * UNIT_SIZE, SCREEN_WIDTH, i * UNIT_SIZE);
 //            }
             /*APPLE*/
+            BufferedImage image = new BufferedImage(currentEmoji.getWidth(this), currentEmoji.getHeight(this), BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2 = image.createGraphics();
+            g2.drawImage(currentEmoji, 0, 0, this);
+
             g.setColor(Color.red);
             g.drawImage(currentEmoji, appleX, appleY, UNIT_SIZE, UNIT_SIZE, this);
 
@@ -122,6 +148,7 @@ public class GamePanel extends JPanel implements ActionListener {
         emojis[4] = new ImageIcon("src/images/watermelon.png");
         /*Appears random emojis on screen*/
         int randomEmoji = random.nextInt(emojis.length);
+
         currentEmoji = emojis[randomEmoji].getImage();
 
         appleX = random.nextInt((int) (SCREEN_WIDTH / UNIT_SIZE)) * UNIT_SIZE;
@@ -131,17 +158,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
 
     public void move() {
-        switch (direction) {
-            case 'U':
-                at.rotate(Math.toRadians(-90), head.getWidth(this) / 2, head.getHeight(this) / 2);
-                break;
-            case 'D':
-                at.rotate(Math.toRadians(90), head.getWidth(this) / 2, head.getHeight(this) / 2);
-                break;
-            case 'L':
-                at.rotate(Math.toRadians(180), head.getWidth(this) / 2, head.getHeight(this) / 2);
-                break;
-        }
+
         for (int i = bodyParts; i > 0; i--) {
             x[i] = x[i - 1];
             y[i] = y[i - 1];
@@ -219,9 +236,12 @@ public class GamePanel extends JPanel implements ActionListener {
         FontMetrics metrics2 = getFontMetrics(g.getFont());
         /*GAME OVER IN THE CENTER OF THE SCREEN*/
         g.drawString("Game Over", (SCREEN_WIDTH - metrics2.stringWidth("Game Over")) / 2, SCREEN_HEIGHT / 2);
-        g.setFont(new Font("Harlow Solid Italic", Font.PLAIN, 25));
-        //  FontMetrics metrics3 = getFontMetrics(g.getFont());
-        // g.drawString("Press ENTER to restart" + applesEaten,(SCREEN_WIDTH - metrics3.stringWidth("Press ENTER to restart"))/5,g.getFont().getSize());
+        /*Press...*/
+        g.setColor(Color.white);
+        g.setFont(new Font("Verdana", Font.PLAIN, 25));
+        FontMetrics metrics3 = getFontMetrics(g.getFont());
+        g.drawString("Press ENTER to restart..." ,(SCREEN_WIDTH - metrics3.stringWidth("Press ENTER to restart"))/5, SCREEN_HEIGHT - g.getFont().getSize());
+
 
         /* Hit Enter to Restart the game! :) */
         addKeyListener(new KeyAdapter() {

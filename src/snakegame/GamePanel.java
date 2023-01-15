@@ -26,9 +26,15 @@ public class GamePanel extends JPanel implements ActionListener {
     boolean running = false;
     Timer timer;
     Random random;
+    private Image head;
 
+    public void LoadImages(){
+        ImageIcon cabecinha = new ImageIcon("images/snakehead.png");
+        head = cabecinha.getImage();
+    }
 
     GamePanel() {
+
         random = new Random();
         this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
         this.setBackground(Color.BLACK);
@@ -66,6 +72,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
             for (int i = 0; i < bodyParts; i++) {
                 if (i == 0) {
+                    g.drawImage(head, x[i], y[i], this);
                     g.setColor(Color.green);
                     g.fillRect(x[i], y[i], UNIT_SIZE, UNIT_SIZE);
                 } else {
@@ -155,6 +162,9 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
 
+    public void restartGame(){
+        new GameFrame();
+    }
 
     public void gameOver(Graphics g) {
         g.setColor(Color.pink);
@@ -168,7 +178,16 @@ public class GamePanel extends JPanel implements ActionListener {
         /*GAME OVER IN THE CENTER OF THE SCREEN*/
         g.drawString("Game Over",(SCREEN_WIDTH - metrics2.stringWidth("Game Over"))/2, SCREEN_HEIGHT/2);
 
+       /* Hit Enter to Restart the game! :) */
+        addKeyListener(new KeyAdapter() {
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    restartGame();
+                }
+            }
+        });
     }
+
 
     @Override
     public void actionPerformed(ActionEvent e) {

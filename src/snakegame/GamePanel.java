@@ -13,8 +13,6 @@ import javax.sound.sampled.*;
 import java.io.File;
 
 
-
-
 public class GamePanel extends JPanel implements ActionListener {
 
 
@@ -58,9 +56,9 @@ public class GamePanel extends JPanel implements ActionListener {
         head = cabecinha.getImage();
         head = head.getScaledInstance(UNIT_SIZE, UNIT_SIZE, Image.SCALE_SMOOTH);
 
-
     }
-    public void LoadBackground(){
+
+    public void LoadBackground() {
         ImageIcon backgroundImg = new ImageIcon("src/images/background.jpg");
         fundo = backgroundImg.getImage();
     }
@@ -69,7 +67,8 @@ public class GamePanel extends JPanel implements ActionListener {
     GamePanel() {
 
         random = new Random();
-        LoadBackground();;
+        LoadBackground();
+        ;
         LoadImages();
         this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
         this.setBackground(Color.BLACK);
@@ -240,7 +239,7 @@ public class GamePanel extends JPanel implements ActionListener {
         g.setColor(Color.white);
         g.setFont(new Font("Verdana", Font.PLAIN, 25));
         FontMetrics metrics3 = getFontMetrics(g.getFont());
-        g.drawString("Press ENTER to restart..." ,(SCREEN_WIDTH - metrics3.stringWidth("Press ENTER to restart"))/5, SCREEN_HEIGHT - g.getFont().getSize());
+        g.drawString("Press ENTER to restart...", (SCREEN_WIDTH - metrics3.stringWidth("Press ENTER to restart")) / 5, SCREEN_HEIGHT - g.getFont().getSize());
 
 
         /* Hit Enter to Restart the game! :) */

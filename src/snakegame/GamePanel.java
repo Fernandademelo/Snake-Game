@@ -39,16 +39,19 @@ public class GamePanel extends JPanel implements ActionListener {
         ImageIcon cabecinha = new ImageIcon("src/images/snakehead.png");
         head = cabecinha.getImage();
         head = head.getScaledInstance(UNIT_SIZE, UNIT_SIZE, Image.SCALE_SMOOTH);
-        ImageIcon backgroundImg = new ImageIcon("src/images/background.png");
+
+
+    }
+    public void LoadBackground(){
+        ImageIcon backgroundImg = new ImageIcon("src/images/background.jpg");
         fundo = backgroundImg.getImage();
-
-
     }
 
 
     GamePanel() {
 
         random = new Random();
+        LoadBackground();;
         LoadImages();
         this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
         this.setBackground(Color.BLACK);
@@ -67,8 +70,8 @@ public class GamePanel extends JPanel implements ActionListener {
 
     public void paintComponent(Graphics g) {
 
-        g.drawImage(fundo, 0, 0, this);
         super.paintComponent(g);
+        g.drawImage(fundo, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, this);
         draw(g);
 
     }
@@ -131,17 +134,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
 
     public void move() {
-        switch (direction) {
-            case 'U':
-                at.rotate(Math.toRadians(-90), head.getWidth(this) / 2, head.getHeight(this) / 2);
-                break;
-            case 'D':
-                at.rotate(Math.toRadians(90), head.getWidth(this) / 2, head.getHeight(this) / 2);
-                break;
-            case 'L':
-                at.rotate(Math.toRadians(180), head.getWidth(this) / 2, head.getHeight(this) / 2);
-                break;
-        }
+
         for (int i = bodyParts; i > 0; i--) {
             x[i] = x[i - 1];
             y[i] = y[i - 1];
@@ -219,9 +212,12 @@ public class GamePanel extends JPanel implements ActionListener {
         FontMetrics metrics2 = getFontMetrics(g.getFont());
         /*GAME OVER IN THE CENTER OF THE SCREEN*/
         g.drawString("Game Over", (SCREEN_WIDTH - metrics2.stringWidth("Game Over")) / 2, SCREEN_HEIGHT / 2);
-        g.setFont(new Font("Harlow Solid Italic", Font.PLAIN, 25));
-        //  FontMetrics metrics3 = getFontMetrics(g.getFont());
-        // g.drawString("Press ENTER to restart" + applesEaten,(SCREEN_WIDTH - metrics3.stringWidth("Press ENTER to restart"))/5,g.getFont().getSize());
+        /*Press...*/
+        g.setColor(Color.white);
+        g.setFont(new Font("Verdana", Font.PLAIN, 25));
+        FontMetrics metrics3 = getFontMetrics(g.getFont());
+        g.drawString("Press ENTER to restart..." ,(SCREEN_WIDTH - metrics3.stringWidth("Press ENTER to restart"))/5, SCREEN_HEIGHT - g.getFont().getSize());
+
 
         /* Hit Enter to Restart the game! :) */
         addKeyListener(new KeyAdapter() {

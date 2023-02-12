@@ -68,7 +68,8 @@ public class GamePanel extends JPanel implements ActionListener {
 
         random = new Random();
         LoadBackground();
-        ;
+        addKeyListener(new MyKeyAdapter());
+        setFocusable(true);
         LoadImages();
         this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
         this.setBackground(Color.BLACK);
@@ -221,7 +222,11 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     public void restartGame() {
-        new GameFrame();
+        GamePanel gamePanel = new GamePanel();
+        this.remove(gamePanel);
+        this.add(gamePanel);
+        this.revalidate();
+        this.repaint();
     }
 
     public void gameOver(Graphics g) {
